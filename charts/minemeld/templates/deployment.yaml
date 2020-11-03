@@ -1,0 +1,115 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "minemeld.fullname" . }}
+  annotations:
+    {{- range $key, $value := .Values.deploymentAnnotations }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  labels:
+    app.kubernetes.io/name: {{ include "minemeld.name" . }}
+    helm.sh/chart: {{ include "minemeld.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  strategy:
+    type: {{ .Values.strategyType }}
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "minemeld.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      {{- if .Values.podAnnotations }}
+      annotations:
+        {{- range $key, $value := .Values.podAnnotations }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
+      {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: {{ template "minemeld.fullname" . }}
+              containerPort: 443
+              protocol: TCP
+          volumeMounts:
+            - name: local
+              mountPath: /opt/minemeld/local
+            - name: log
+              mountPath: /opt/minemeld/log
+            {{- if and .Values.customTLS .Values.customTLS.enabled .Values.customTLS.secret }}
+            - name: tls
+              mountPath: /var/secrets
+              readOnly: true
+            {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: {{ template "minemeld.fullname" . }}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ template "minemeld.fullname" . }}
+          {{- if and .Values.customTLS .Values.customTLS.enabled .Values.customTLS.secret }}
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                  - /bin/sh
+                  - -c
+                  - mount -o acl,remount,rw /; cp -f /var/secrets/tls.crt /etc/nginx/minemeld.cer; cp -f /var/secrets/tls.key /etc/nginx/minemeld.pem
+          {{- else }}
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                  - /bin/sh
+                  - -c
+                  - mount -o acl,remount,rw /
+          {{ end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: local
+        {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ if .Values.persistence.local.existingClaim }}{{ .Values.persistence.local.existingClaim }}{{- else }}{{ template "minemeld.fullname" . }}-local{{- end }}
+        {{- else }}
+          emptyDir: {}
+        {{ end }}
+        - name: log
+        {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ if .Values.persistence.log.existingClaim }}{{ .Values.persistence.log.existingClaim }}{{- else }}{{ template "minemeld.fullname" . }}{{- end }}
+        {{- else }}
+          emptyDir: {}
+        {{ end }}
+        {{- if and .Values.customTLS .Values.customTLS.enabled .Values.customTLS.secret }}
+        - name: tls
+          secret:
+            secretName: "{{ .Values.customTLS.secret }}"
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
