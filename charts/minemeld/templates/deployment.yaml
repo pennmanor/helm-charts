@@ -21,6 +21,9 @@ spec:
       app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "minemeld.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
       {{- if .Values.podAnnotations }}
       annotations:
         {{- range $key, $value := .Values.podAnnotations }}
