@@ -61,10 +61,12 @@ spec:
             httpGet:
               path: /
               port: {{ template "minemeld.fullname" . }}
+              scheme: HTTPS
           readinessProbe:
             httpGet:
               path: /
               port: {{ template "minemeld.fullname" . }}
+              scheme: HTTPS
           {{- if and .Values.customTLS .Values.customTLS.enabled .Values.customTLS.secret }}
           lifecycle:
             postStart:
