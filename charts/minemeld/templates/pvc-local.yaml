@@ -22,28 +22,3 @@ spec:
 {{- end }}
 {{- end }}
 {{- end -}}
-
-{{- if and .Values.persistence.enabled (not .Values.persistence.log.existingClaim) }}
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: {{ template "minemeld.fullname" . }}-log
-  labels:
-    app.kubernetes.io/name: {{ include "minemeld.name" . }}
-    helm.sh/chart: {{ include "minemeld.chart" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
-spec:
-  accessModes:
-    - {{ .Values.persistence.log.accessMode | quote }}
-  resources:
-    requests:
-      storage: {{ .Values.persistence.log.size | quote }}
-{{- if .Values.persistence.log.storageClass }}
-{{- if (eq "-" .Values.persistence.log.storageClass) }}
-  storageClassName: ""
-{{- else }}
-  storageClassName: "{{ .Values.persistence.log.storageClass }}"
-{{- end }}
-{{- end }}
-{{- end -}}
