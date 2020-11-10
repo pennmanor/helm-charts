@@ -2,7 +2,7 @@ apiVersion: v2
 name: minemeld
 description: A Helm chart for Palo Alto Networks MineMeld
 type: application
-version: 0.1.4
+version: 0.1.5
 appVersion: 0.9.70.post1-build2
 keywords:
   - minemeld
