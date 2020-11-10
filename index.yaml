@@ -3,6 +3,28 @@ entries:
   minemeld:
   - apiVersion: v2
     appVersion: 0.9.70.post1-build2
+    created: "2020-11-10T20:35:51.239188382Z"
+    description: A Helm chart for Palo Alto Networks MineMeld
+    digest: 638105ce871422938baa33d4f7c01507b396864b8f4b5b0be1a17c2c2c0e2698
+    home: https://github.com/pennmanor/helm-charts/tree/master/charts/minemeld
+    icon: https://www.paloaltonetworks.com/content/dam/pan/en_US/images/products/minemeld/image002.png
+    keywords:
+    - minemeld
+    - palo alto
+    maintainers:
+    - email: nick@pennmanor.net
+      name: Nick Joniec
+    - email: chad@pennmanor.net
+      name: Chad Billman
+    name: minemeld
+    sources:
+    - https://github.com/PaloAltoNetworks/minemeld-docker
+    type: application
+    urls:
+    - https://github.com/pennmanor/helm-charts/releases/download/minemeld-0.1.6/minemeld-0.1.6.tgz
+    version: 0.1.6
+  - apiVersion: v2
+    appVersion: 0.9.70.post1-build2
     created: "2020-11-10T20:00:12.254040825Z"
     description: A Helm chart for Palo Alto Networks MineMeld
     digest: df33d94c1e083343a3cfe3db957988bc666581fe9deaecfe15117a6ca2df10af
