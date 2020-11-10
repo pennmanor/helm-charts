@@ -74,7 +74,7 @@ spec:
                 command:
                   - /bin/sh
                   - -c
-                  - mount -o acl,remount,rw /; cp -f /var/secrets/tls.crt /etc/nginx/minemeld.cer; cp -f /var/secrets/tls.key /etc/nginx/minemeld.pem
+                  - mount -o acl,remount,rw /; cp -f /var/secrets/tls.crt /etc/nginx/minemeld.cer; cp -f /var/secrets/tls.key /etc/nginx/minemeld.pem; chown -R minemeld:minemeld /opt/minemeld/log/
           {{- else }}
           lifecycle:
             postStart:
@@ -82,7 +82,7 @@ spec:
                 command:
                   - /bin/sh
                   - -c
-                  - mount -o acl,remount,rw /
+                  - mount -o acl,remount,rw /; chown -R minemeld:minemeld /opt/minemeld/log/
           {{ end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
