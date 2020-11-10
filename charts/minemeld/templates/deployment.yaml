@@ -97,7 +97,7 @@ spec:
         - name: log
         {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:
-            claimName: {{ if .Values.persistence.log.existingClaim }}{{ .Values.persistence.log.existingClaim }}{{- else }}{{ template "minemeld.fullname" . }}{{- end }}
+            claimName: {{ if .Values.persistence.log.existingClaim }}{{ .Values.persistence.log.existingClaim }}{{- else }}{{ template "minemeld.fullname" . }}-log{{- end }}
         {{- else }}
           emptyDir: {}
         {{ end }}
